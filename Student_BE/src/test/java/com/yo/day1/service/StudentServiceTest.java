@@ -1,5 +1,6 @@
 package com.yo.day1.service;
 
+import com.yo.day1.common.exception.NotFoundExeception;
 import com.yo.day1.domain.entity.Parent;
 import com.yo.day1.domain.entity.Student;
 import com.yo.day1.domain.enums.Gender;
@@ -117,18 +118,14 @@ public class StudentServiceTest {
     }
 
     @Test
-    void createSuccessWhenParentNotFound() {
+    void createThrowsWhenParentNotFound() {
         StudentUpsertRequest request = buildRequest(99L);
 
         when(parentRepository.findById(99L)).thenReturn(Optional.empty());
-        when(mapper.map(request, Student.class)).thenReturn(new Student());
-        when(studentRepository.save(any(Student.class))).thenReturn(new Student());
-        when(mapper.map(any(Student.class), eq(StudentResponse.class))).thenReturn(createMockResponse(1L, "SV01"));
 
-        // create() dùng ifPresent → không ném exception khi không tìm thấy parent
-        StudentResponse result = studentService.create(request);
-
-        assertThat(result).isNotNull();
+        assertThatThrownBy(() -> studentService.create(request))
+                .isInstanceOf(NotFoundExeception.class)
+                .hasMessageContaining("Phụ huynh không tồn tại: 99");
     }
 
     // ==================== update ====================

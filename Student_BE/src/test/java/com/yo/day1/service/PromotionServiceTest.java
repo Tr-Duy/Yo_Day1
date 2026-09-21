@@ -152,6 +152,8 @@ public class PromotionServiceTest {
 
     private PromotionUpsertRequest buildRequest() {
         PromotionUpsertRequest req = new PromotionUpsertRequest();
+        req.setPromoCode("SUMMER2026");
+        req.setName("Khuyến mãi hè");
         return req;
     }
 

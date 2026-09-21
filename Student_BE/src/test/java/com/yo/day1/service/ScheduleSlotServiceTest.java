@@ -105,6 +105,10 @@ public class ScheduleSlotServiceTest {
     private ScheduleSlot createEntity(long id) {
         ScheduleSlot entity = new ScheduleSlot();
         entity.setId(id);
+        entity.setSlotCode("SLOT-01");
+        entity.setWeekday((byte) 2);
+        entity.setStartTime(java.time.LocalTime.of(17, 30));
+        entity.setEndTime(java.time.LocalTime.of(19, 0));
         return entity;
     }
 }

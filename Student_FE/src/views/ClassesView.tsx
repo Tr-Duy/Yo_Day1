@@ -3,8 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { toast } from 'react-hot-toast';
 import {
-  Search, Plus, Edit, Trash2, Eye, School, Calendar, Clock, DoorOpen, UserCheck
+  Search, Plus, Edit, Trash2, Eye, School, Calendar, Clock, DoorOpen, UserCheck, AlertCircle, RefreshCw, Award
 } from 'lucide-react';
 import { classesApi } from '../features/classes/classes.api';
 import { referenceApi } from '../features/reference/reference.api';
@@ -20,7 +21,6 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '.
 import { EmptyState } from '../components/ui/EmptyState';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { ClassGradesModal } from '../components/ClassGradesModal';
-import { Award } from 'lucide-react';
 
 // ==========================================
 // FORM VALIDATION SCHEMA WITH ZOD
@@ -66,7 +66,7 @@ export const ClassesView: React.FC = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  const { data: classesData, isLoading } = useQuery({
+  const { data: classesData, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['courseClasses', debouncedSearch, statusFilter, page],
     queryFn: async () => {
       const activeStatus = statusFilter !== 'ALL' ? (statusFilter as ClassStatus) : undefined;
@@ -103,22 +103,30 @@ export const ClassesView: React.FC = () => {
       }
     },
     onSuccess: () => {
+      toast.success(editingClassId ? 'Cập nhật lớp học thành công!' : 'Tạo lớp học mới thành công!');
       queryClient.invalidateQueries({ queryKey: ['courseClasses'] });
       queryClient.invalidateQueries({ queryKey: ['enrollment-classes'] });
       queryClient.invalidateQueries({ queryKey: ['classes-list'] });
       queryClient.invalidateQueries({ queryKey: ['classes-lookup'] });
       setIsUpsertOpen(false);
+    },
+    onError: (err: any) => {
+      toast.error(err.message || 'Thao tác không thành công');
     }
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => classesApi.delete(id),
     onSuccess: () => {
+      toast.success('Đã xóa lớp học thành công!');
       queryClient.invalidateQueries({ queryKey: ['courseClasses'] });
       queryClient.invalidateQueries({ queryKey: ['enrollment-classes'] });
       queryClient.invalidateQueries({ queryKey: ['classes-list'] });
       queryClient.invalidateQueries({ queryKey: ['classes-lookup'] });
       setIsConfirmDeleteOpen(false);
+    },
+    onError: (err: any) => {
+      toast.error(err.message || 'Không thể xóa lớp học');
     }
   });
 
@@ -231,11 +239,39 @@ export const ClassesView: React.FC = () => {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-slate-500">Đang tải...</TableCell></TableRow>
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-12 text-foreground-muted">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <RefreshCw className="h-6 w-6 animate-spin text-brand-500" />
+                    <span className="text-sm font-medium">Đang tải lớp học...</span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={7} className="py-12 text-center">
+                  <div className="flex flex-col items-center justify-center gap-3 max-w-md mx-auto">
+                    <div className="p-3 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-full">
+                      <AlertCircle className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-rose-600 dark:text-rose-400 text-sm">Không thể tải danh sách lớp học</h4>
+                      <p className="text-xs text-foreground-muted mt-1">{(error as Error)?.message || 'Lỗi kết nối máy chủ'}</p>
+                    </div>
+                    <Button variant="secondary" size="sm" onClick={() => refetch()} icon={<RefreshCw size={14} />}>
+                      Thử lại
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : classesList.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-8">
-                  <EmptyState title="Không có lớp học" description="Không tìm thấy lớp học nào khớp với tìm kiếm." isSearch />
+                <TableCell colSpan={7} className="py-12">
+                  <EmptyState
+                    title={debouncedSearch || statusFilter !== 'ALL' ? 'Không tìm thấy lớp học' : 'Chưa có lớp học'}
+                    description={debouncedSearch || statusFilter !== 'ALL' ? 'Không có lớp học nào khớp với tìm kiếm hoặc bộ lọc.' : 'Chưa có lớp học nào trong hệ thống.'}
+                    isSearch={Boolean(debouncedSearch || statusFilter !== 'ALL')}
+                  />
                 </TableCell>
               </TableRow>
             ) : (

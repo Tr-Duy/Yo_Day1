@@ -152,6 +152,7 @@ public class ParentServiceTest {
 
     private ParentUpsertRequest buildRequest() {
         ParentUpsertRequest req = new ParentUpsertRequest();
+        req.setFullName("Nguyễn Văn Phụ Huynh");
         return req;
     }
 

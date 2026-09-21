@@ -166,6 +166,9 @@ public class CourseServiceTest {
 
     private CourseUpsertRequest buildRequest() {
         CourseUpsertRequest req = new CourseUpsertRequest();
+        req.setCourseCode("CRS-01");
+        req.setCourseName("Toán 10");
+        req.setTotalSession(30);
         return req;
     }
 

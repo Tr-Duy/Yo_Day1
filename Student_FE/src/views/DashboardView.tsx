@@ -81,9 +81,6 @@ export const DashboardView: React.FC = () => {
           <h2 className="text-2xl font-semibold text-foreground">Tổng quan</h2>
           <p className="text-sm text-foreground-muted mt-1">Kết quả tài chính, sĩ số lớp học và tiến độ đào tạo.</p>
         </div>
-        <div className="bg-surface border border-border rounded-md px-3 py-1.5 text-sm font-medium text-foreground-secondary shadow-sm">
-          Năm học 2026 - Học kỳ Hè
-        </div>
       </div>
 
       {/* KPI Cards */}

@@ -100,7 +100,7 @@ public class BillingServiceTest {
         when(tuitionInvoiceRepository.existsByStudentIdAndCourseClassIdAndBillingMonth(1L, 1L, LocalDate.now().withDayOfMonth(1))).thenReturn(true);
         
         assertThatThrownBy(() -> service.createInvoice(request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(com.yo.day1.common.exception.ConflictException.class)
                 .hasMessageContaining("Đã có hóa đơn tháng");
     }
 

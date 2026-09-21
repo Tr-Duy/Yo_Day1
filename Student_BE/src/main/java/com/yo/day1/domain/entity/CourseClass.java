@@ -55,4 +55,7 @@ public class CourseClass extends AuditableEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ClassStatus status = ClassStatus.OPEN;
+
+    @Column(name = "semester_id")
+    private Long semesterId = 1L;
 }

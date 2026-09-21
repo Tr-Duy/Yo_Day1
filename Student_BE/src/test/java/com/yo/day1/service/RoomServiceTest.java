@@ -151,6 +151,9 @@ public class RoomServiceTest {
 
     private RoonUpsertRequest buildRequest() {
         RoonUpsertRequest req = new RoonUpsertRequest();
+        req.setRoomCode("LAB-101");
+        req.setName("Phòng Lab 101");
+        req.setCapacity(30);
         return req;
     }
 

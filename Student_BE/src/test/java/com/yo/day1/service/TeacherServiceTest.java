@@ -190,6 +190,9 @@ public class TeacherServiceTest {
 
     private TeacherUpsertRequest buildRequest() {
         TeacherUpsertRequest req = new TeacherUpsertRequest();
+        req.setTeacherCode("GV-01");
+        req.setFullName("Nguyễn Văn Giáo Viên");
+        req.setPhone("0912345678");
         return req;
     }
 
